@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website 2</title>
+    <style>
+        body { background-color: white; }
+    </style>
+</head>
+<body>
+    <h1>Website 2</h1>
+    <div id="colorIndicator" style="width: 100px; height: 100px;"></div>
+
+    <script>
+        const socket = new WebSocket('ws://localhost:3000'); // WebSocket server URL
+
+        socket.addEventListener('message', (event) => {
+            console.log('Received message:', event.data);
+
+            // Check if the received data is a Blob and convert it to a string
+            if (event.data instanceof Blob) {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    const color = reader.result; // This should be the color as a string
+                    if (color) {
+                        document.getElementById('colorIndicator').style.backgroundColor = color;
+                    }
+                };
+                reader.readAsText(event.data);
+            } else {
+                // If the data is already a string, use it directly
+                const color = event.data;
+                if (color) {
+                    document.getElementById('colorIndicator').style.backgroundColor = color;
+                }
+            }
+        });
+
+        socket.addEventListener('open', (event) => {
+            console.log('WebSocket connection opened.');
+        });
+
+        socket.addEventListener('close', (event) => {
+            console.log('WebSocket connection closed.');
+        });
+    </script>
+</body>
+</html>
